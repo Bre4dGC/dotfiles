@@ -42,8 +42,7 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 exec --no-startup-id nm-applet
 
 # Keyboard layout settings
-exec "setxkbmap -layout us,ru"
-exec "setxkbmap -option 'grp:alt_shift_toggle'"
+exec "setxkbmap -layout us,ru && setxkbmap -option 'grp:alt_shift_toggle'"
 
 # Window colors
 client.focused           $lavender $base $text  $rosewater $lavender
@@ -57,7 +56,7 @@ client.background        $base
 exec_always picom -f
 
 # Wallpaper
-exec --no-startup-id feh --bg-scale ~/Downloads/ff9235cd827885e439aef1bb9e153754.jpg
+exec --no-startup-id feh --bg-scale "~/Downloads/ff9235cd827885e439aef1bb9e153754.jpg"
 
 # Volume controls
 set $refresh_i3status killall -SIGUSR1 i3status
@@ -71,12 +70,17 @@ floating_modifier Mod1
 focus_follows_mouse no
 tiling_drag modifier titlebar
 
+set $browser "/var/lib/flatpak/exports/bin/com.brave.Browser"
+set $vpn "/var/lib/flatpak/exports/bin/com.protonvpn.www"
+set $telegram "/var/lib/flatpak/exports/bin/org.telegram.desktop"
+set $discord "/var/lib/flatpak/exports/bin/dev.vencord.Vesktop"
+
 # Application shortcuts
 bindsym $mod+t exec kitty
 bindsym $mod+c exec code
-bindsym $mod+v exec Proton Vpn
+bindsym $mod+v exec $vpn
 bindsym $mod+e exec emacs-gtk+x11
-bindsym $mod+b exec firefox
+bindsym $mod+b exec $browser
 bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
 bindsym Ctrl+q kill
@@ -115,16 +119,23 @@ bindsym $mod+Shift+minus move scratchpad
 bindsym $mod+minus scratchpad show
 
 # Workspace definitions
-set $ws1 "1:"
-set $ws2 "2:"
-set $ws3 "3:"
-set $ws4 "4:"
-set $ws5 "5:"
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
 set $ws6 "6"
 set $ws7 "7"
 set $ws8 "8"
 set $ws9 "9"
 set $ws10 "10"
+
+# Allocate applications to workspaces
+for_window [class=$browser] move to workspace $ws1
+for_window [class="emacs-gtk+x11"] move to workspace $ws2
+for_window [class="kitty"] move to workspace $ws3
+for_window [class=$telegram] move to workspace $ws4
+for_window [class=$discord] move to workspace $ws4
 
 # Workspace navigation
 bindsym $mod+1 workspace number $ws1
@@ -170,7 +181,7 @@ bindsym $mod+r mode "resize"
 
 # Status bar
 bar {
-    status_command i3status -c /home/$USER/.config/i3status/i3status.conf
+    status_command i3status -c "~/bread-dotfiles/i3/i3status.conf"
     i3bar_command i3bar --transparency
     tray_output none
 
@@ -185,5 +196,131 @@ bar {
         active_workspace   $base  $surface2 $text
         inactive_workspace $base  $base     $text
         urgent_workspace   $base  $red      $crust
-     }
+    }
+}
+
+# default gaps
+gaps inner 10
+gaps outer 0
+
+# gaps
+set $mode_gaps Gaps: (o)uter, (i)nner, (h)orizontal, (v)ertical, (t)op, (r)ight, (b)ottom, (l)eft
+set $mode_gaps_outer Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)
+set $mode_gaps_inner Inner Gaps: +|-|0 (local), Shift + +|-|0 (global)
+set $mode_gaps_horiz Horizontal Gaps: +|-|0 (local), Shift + +|-|0 (global)
+set $mode_gaps_verti Vertical Gaps: +|-|0 (local), Shift + +|-|0 (global)
+set $mode_gaps_top Top Gaps: +|-|0 (local), Shift + +|-|0 (global)
+set $mode_gaps_right Right Gaps: +|-|0 (local), Shift + +|-|0 (global)
+set $mode_gaps_bottom Bottom Gaps: +|-|0 (local), Shift + +|-|0 (global)
+set $mode_gaps_left Left Gaps: +|-|0 (local), Shift + +|-|0 (global)
+bindsym $mod+Shift+g mode "$mode_gaps"
+
+mode "$mode_gaps" {
+        bindsym o      mode "$mode_gaps_outer"
+        bindsym i      mode "$mode_gaps_inner"
+        bindsym h      mode "$mode_gaps_horiz"
+        bindsym v      mode "$mode_gaps_verti"
+        bindsym t      mode "$mode_gaps_top"
+        bindsym r      mode "$mode_gaps_right"
+        bindsym b      mode "$mode_gaps_bottom"
+        bindsym l      mode "$mode_gaps_left"
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
+}
+
+mode "$mode_gaps_outer" {
+        bindsym plus  gaps outer current plus 5
+        bindsym minus gaps outer current minus 5
+        bindsym 0     gaps outer current set 0
+
+        bindsym Shift+plus  gaps outer all plus 5
+        bindsym Shift+minus gaps outer all minus 5
+        bindsym Shift+0     gaps outer all set 0
+
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
+}
+mode "$mode_gaps_inner" {
+        bindsym plus  gaps inner current plus 5
+        bindsym minus gaps inner current minus 5
+        bindsym 0     gaps inner current set 0
+
+        bindsym Shift+plus  gaps inner all plus 5
+        bindsym Shift+minus gaps inner all minus 5
+        bindsym Shift+0     gaps inner all set 0
+
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
+}
+mode "$mode_gaps_horiz" {
+        bindsym plus  gaps horizontal current plus 5
+        bindsym minus gaps horizontal current minus 5
+        bindsym 0     gaps horizontal current set 0
+
+        bindsym Shift+plus  gaps horizontal all plus 5
+        bindsym Shift+minus gaps horizontal all minus 5
+        bindsym Shift+0     gaps horizontal all set 0
+
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
+}
+mode "$mode_gaps_verti" {
+        bindsym plus  gaps vertical current plus 5
+        bindsym minus gaps vertical current minus 5
+        bindsym 0     gaps vertical current set 0
+
+        bindsym Shift+plus  gaps vertical all plus 5
+        bindsym Shift+minus gaps vertical all minus 5
+        bindsym Shift+0     gaps vertical all set 0
+
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
+}
+mode "$mode_gaps_top" {
+        bindsym plus  gaps top current plus 5
+        bindsym minus gaps top current minus 5
+        bindsym 0     gaps top current set 0
+
+        bindsym Shift+plus  gaps top all plus 5
+        bindsym Shift+minus gaps top all minus 5
+        bindsym Shift+0     gaps top all set 0
+
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
+}
+mode "$mode_gaps_right" {
+        bindsym plus  gaps right current plus 5
+        bindsym minus gaps right current minus 5
+        bindsym 0     gaps right current set 0
+
+        bindsym Shift+plus  gaps right all plus 5
+        bindsym Shift+minus gaps right all minus 5
+        bindsym Shift+0     gaps right all set 0
+
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
+}
+mode "$mode_gaps_bottom" {
+        bindsym plus  gaps bottom current plus 5
+        bindsym minus gaps bottom current minus 5
+        bindsym 0     gaps bottom current set 0
+
+        bindsym Shift+plus  gaps bottom all plus 5
+        bindsym Shift+minus gaps bottom all minus 5
+        bindsym Shift+0     gaps bottom all set 0
+
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
+}
+mode "$mode_gaps_left" {
+        bindsym plus  gaps left current plus 5
+        bindsym minus gaps left current minus 5
+        bindsym 0     gaps left current set 0
+
+        bindsym Shift+plus  gaps left all plus 5
+        bindsym Shift+minus gaps left all minus 5
+        bindsym Shift+0     gaps left all set 0
+
+        bindsym Return mode "$mode_gaps"
+        bindsym Escape mode "default"
 }
